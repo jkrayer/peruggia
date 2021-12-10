@@ -3,9 +3,11 @@
 import readline from "readline";
 import fs from "fs";
 import path from "path";
+import xml2js from "xml2js";
 import { error, info, success } from "./log.mjs";
 
 let campaignFile;
+const parser = new xml2js.Parser();
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -37,7 +39,17 @@ info(
           return QuestionOne();
         }
 
-        campaignFile = data;
+        parser.parseString(data, function (err, result) {
+          if (err) {
+            error(
+              `\nCould not parse database file. Please start Fantasy Grounds to repair the file.`,
+              err
+            );
+            return rl.close();
+          }
+
+          campaignFile = JSON.stringify(result);
+        });
 
         QuestionTwo();
       }
