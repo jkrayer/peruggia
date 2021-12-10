@@ -1,0 +1,23 @@
+{
+  "name": "peruggia",
+  "version": "0.0.0",
+  "description": "A cli tool for extracting notes from Fantasy Grounds.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "peruggia": "./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkrayer/peruggia.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jkrayer/peruggia/issues"
+  },
+  "homepage": "https://github.com/jkrayer/peruggia#readme"
+}
