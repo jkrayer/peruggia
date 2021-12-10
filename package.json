@@ -2,7 +2,7 @@
   "name": "peruggia",
   "version": "0.0.0",
   "description": "A cli tool for extracting notes from Fantasy Grounds.",
-  "main": "index.js",
+  "main": "src/index.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
@@ -31,5 +31,8 @@
     "husky": "^7.0.0",
     "prettier": "^2.5.1",
     "pretty-quick": "^3.1.2"
+  },
+  "dependencies": {
+    "chalk": "^5.0.0"
   }
 }

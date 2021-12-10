@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-const readline = require("readline");
-const fs = require("fs");
-const path = require("path");
+import readline from "readline";
+import fs from "fs";
+import path from "path";
+import { error, info, success } from "./log.mjs";
 
 let campaignFile;
 
@@ -12,7 +13,7 @@ const rl = readline.createInterface({
   //   prompt: "peruggia> ",
 });
 
-console.log(
+info(
   '\nStarting peruggia. Type "exit" in any field or press CTRL + C to end. \n'
 );
 
@@ -30,14 +31,13 @@ console.log(
       },
       (err, data) => {
         if (err) {
-          console.log(
+          error(
             `\nCould not find file ${err.path}. Please confirm the campaign exists in this location and try again.\n`
           );
           return QuestionOne();
         }
 
         campaignFile = data;
-        console.log("fileread", typeof campaignFile);
 
         QuestionTwo();
       }
@@ -51,11 +51,11 @@ function QuestionTwo() {
       return rl.close();
     }
 
-    const pth = path.resolve(__dirname, folder);
+    const pth = path.resolve(folder);
 
     fs.mkdir(pth, { recursive: true }, (err) => {
       if (err) {
-        console.log(
+        error(
           `Could not create folder ${pth}. Please check folder permissions and try again.`
         );
         return rl.close();
@@ -66,17 +66,17 @@ function QuestionTwo() {
 
     fs.writeFile(`${pth}/testfile.xml`, campaignFile, (err) => {
       if (err) {
-        console.log("\n Error writing file", err);
+        error("\n Error writing file", err);
         return;
       }
 
-      console.log("\nperrugia finished writing files.");
+      success("\nperrugia finished writing files.");
       rl.close();
     });
   });
 }
 
 rl.on("close", () => {
-  console.log("\nExiting peruggia.\n");
+  info("\nExiting peruggia.\n");
   process.exit(0);
 });
