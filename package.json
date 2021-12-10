@@ -4,10 +4,17 @@
   "description": "A cli tool for extracting notes from Fantasy Grounds.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install",
+    "pretty-quick": "pretty-quick --staged"
   },
   "bin": {
     "peruggia": "./src/index.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick"
+    }
   },
   "repository": {
     "type": "git",
@@ -19,5 +26,10 @@
   "bugs": {
     "url": "https://github.com/jkrayer/peruggia/issues"
   },
-  "homepage": "https://github.com/jkrayer/peruggia#readme"
+  "homepage": "https://github.com/jkrayer/peruggia#readme",
+  "devDependencies": {
+    "husky": "^7.0.0",
+    "prettier": "^2.5.1",
+    "pretty-quick": "^3.1.2"
+  }
 }
