@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import xml2js from "xml2js";
 import { error, info, success } from "./log.mjs";
+import parseNotes from "./parser.mjs";
 
 let campaignFile;
 const parser = new xml2js.Parser();
@@ -48,7 +49,7 @@ info(
             return rl.close();
           }
 
-          campaignFile = JSON.stringify(result);
+          campaignFile = result;
         });
 
         QuestionTwo();
@@ -58,7 +59,7 @@ info(
 })();
 
 function QuestionTwo() {
-  rl.question("\nWhat folder should peruggia write to?", (folder) => {
+  rl.question("\nWhat folder should peruggia write to? ", (folder) => {
     if (folder.toLowerCase() === "exit") {
       return rl.close();
     }
@@ -74,17 +75,19 @@ function QuestionTwo() {
       }
     });
 
-    console.log(`\nWriting files to ${pth}`);
+    const parsedNotes = parseNotes(campaignFile);
 
-    fs.writeFile(`${pth}/testfile.xml`, campaignFile, (err) => {
-      if (err) {
-        error("\n Error writing file", err);
-        return;
-      }
+    const promises = parsedNotes.map(([title, body]) => {
+      const filename = path.resolve(pth, `${title}.md`);
 
-      success("\nperrugia finished writing files.");
-      rl.close();
+      return fs.promises
+        .writeFile(filename, body)
+        .then(() => success(`perrugia wrote file: ${filename}`))
+        .catch(() => error(`Error writing file; ${filename}`, err));
     });
+
+    // Might add a questions 3, exit or start again
+    Promise.all(promises).then(() => rl.close());
   });
 }
 
