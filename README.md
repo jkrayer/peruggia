@@ -1,10 +1,10 @@
 # peruggia
 
-A cli tool for extracting notes from Fantasy Grounds.
+A cli tool for extracting calendar events from Fantasy Grounds.
 
 ## The Plan
 
-1.  The goal of the project is a CLI tool to cull notes from a Fantasy Grounds DB and write md files... probably for 11ty.
+1.  The goal of the project is a CLI tool to cull calendar data from a Fantasy Grounds DB and write md files... probably for 11ty.
 
 - It also may need to categorize
 - Follow or Add Links and write accordingly
@@ -24,3 +24,7 @@ A cli tool for extracting notes from Fantasy Grounds.
 - and then the app would need Permissions...
 
 _(Vincent Peruggia famously stole the Mona Lisa from the Louvre in 1911.)_
+
+## TODO
+
+Fix note formatting. HTML is being extracted but I would like it not to be.

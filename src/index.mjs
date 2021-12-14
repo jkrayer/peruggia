@@ -3,12 +3,11 @@
 import readline from "readline";
 import fs from "fs";
 import path from "path";
-import xml2js from "xml2js";
+import convert from "xml-js";
 import { error, info, success } from "./log.mjs";
-import parseNotes from "./parser.mjs";
+import parseCalendar from "./parser.mjs";
 
 let campaignFile;
-const parser = new xml2js.Parser();
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -40,16 +39,9 @@ info(
           return QuestionOne();
         }
 
-        parser.parseString(data, function (err, result) {
-          if (err) {
-            error(
-              `\nCould not parse database file. Please start Fantasy Grounds to repair the file.`,
-              err
-            );
-            return rl.close();
-          }
-
-          campaignFile = result;
+        campaignFile = convert.xml2js(data, {
+          compact: true,
+          spaces: 4,
         });
 
         QuestionTwo();
@@ -75,7 +67,7 @@ function QuestionTwo() {
       }
     });
 
-    const parsedNotes = parseNotes(campaignFile);
+    const parsedNotes = parseCalendar(campaignFile);
 
     const promises = parsedNotes.map(([title, body]) => {
       const filename = path.resolve(pth, `${title}.md`);
