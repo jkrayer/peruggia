@@ -75,7 +75,7 @@ function QuestionTwo() {
       return fs.promises
         .writeFile(filename, body)
         .then(() => success(`perrugia wrote file: ${filename}`))
-        .catch(() => error(`Error writing file; ${filename}`, err));
+        .catch((err) => error(`Error writing file; ${filename}`, err));
     });
 
     // Might add a questions 3, exit or start again
