@@ -4,7 +4,7 @@ import readline from "readline";
 import fs from "fs";
 import path from "path";
 import { error, info, success } from "./log.mjs";
-import parseCalendar from "./parser.mjs";
+import parseCalendar from "./js-parser.mjs";
 import xmlparser from "./xml-parser.mjs";
 
 let campaignFile;
