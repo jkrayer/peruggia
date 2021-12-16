@@ -3,16 +3,15 @@
 import readline from "readline";
 import fs from "fs";
 import path from "path";
-import convert from "xml-js";
 import { error, info, success } from "./log.mjs";
 import parseCalendar from "./parser.mjs";
+import xmlparser from "./xml-parser.mjs";
 
 let campaignFile;
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-  //   prompt: "peruggia> ",
 });
 
 info(
@@ -39,10 +38,7 @@ info(
           return QuestionOne();
         }
 
-        campaignFile = convert.xml2js(data, {
-          compact: true,
-          spaces: 4,
-        });
+        campaignFile = xmlparser(data);
 
         QuestionTwo();
       }
@@ -66,6 +62,12 @@ function QuestionTwo() {
         return rl.close();
       }
     });
+
+    // Test File. Remove for Prod
+    fs.promises
+      .writeFile(`${pth}/test.json`, JSON.stringify(campaignFile))
+      .then(() => success(`perrugia wrote file: `))
+      .catch((err) => error(`Error writing file; `, err));
 
     const parsedNotes = parseCalendar(campaignFile);
 
