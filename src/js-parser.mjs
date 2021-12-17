@@ -8,6 +8,7 @@ import {
   not,
   path,
   pathOr,
+  pathSatisfies,
   prop,
   test,
   toPairs,
@@ -26,7 +27,9 @@ const notEmpty = compose(not, isEmpty);
 const notNil = compose(not, isNil);
 
 // hasContent:: Logentry -> Boolean
-const hasContent = (x) => notEmpty(x.p) || notNil(x.linklist); // propSatisfies(notNil, "linklist");
+const hasContent = (x) =>
+  pathSatisfies(notNil, ["p", "text"], x) ||
+  pathSatisfies(notNil, ["linklist"], x);
 
 // hasLogentry:: CalendarItem -> Boolean
 const hasLogentry = compose(hasContent, pathOr({}, ["logentry"]));
