@@ -63,14 +63,6 @@ function QuestionTwo() {
       }
     });
 
-    // Test File. Remove for Prod
-    const jsonP = fs.promises
-      .writeFile(`${pth}/test.json`, JSON.stringify(campaignFile))
-      .then(() => {
-        success(`perrugia wrote file: ${pth}/test.json`);
-      })
-      .catch((err) => error(`Error writing file; `, err));
-
     const parsedNotes = parseCalendar(campaignFile);
 
     const promises = parsedNotes.map(([title, body]) => {
@@ -83,7 +75,7 @@ function QuestionTwo() {
     });
 
     // Might add a questions 3, exit or start again
-    Promise.all([jsonP, ...promises]).then(() => rl.close());
+    Promise.all(promises).then(() => rl.close());
   });
 }
 
