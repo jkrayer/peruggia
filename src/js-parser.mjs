@@ -9,9 +9,6 @@ import {
   path,
   pathOr,
   prop,
-  reduce,
-  replace,
-  split,
   test,
   toPairs,
 } from "ramda";
@@ -35,7 +32,7 @@ const hasContent = (x) => notEmpty(x.p) || notNil(x.linklist); // propSatisfies(
 const hasLogentry = compose(hasContent, pathOr({}, ["logentry"]));
 
 // getText:: Object -> String
-const getText = prop("_text");
+const getText = prop("text");
 
 // getLink:: Object -> String
 const getLink = prop("link");
@@ -44,7 +41,10 @@ const getLink = prop("link");
 const joinNewLine = join("\n\n");
 
 // getId:: Link -> String
-const getId = path(["_attributes", "recordname"]);
+const getId = path(["attributes", "recordname"]);
+
+// toArray:: Any -> Any[]
+const toArray = (x) => [].concat(x);
 
 // ----- Parsers -----
 
@@ -55,39 +55,47 @@ let getParsedEntry;
 const initFinder = (campaignFile) => (id) =>
   path(["root", ...id.split(".")], campaignFile);
 
-// parseP:: Paragraph -> String
-const parseP = (p) =>
-  Array.isArray(p) ? joinNewLine(map(getText, p)) : getText(p);
+// parseP:: Paragraph[] -> String
+const parseP = compose(joinNewLine, map(getText));
 
-// parseLL:: linkedlist -> String
-const parseLL = (ll) =>
-  Array.isArray(ll.link)
-    ? join("\n\n", map(getText, ll.link))
-    : getText(ll.link);
+// parseH::
+const parseH = compose(join("\n\n### "), map(getText));
 
-// const title = replace(/'|\s|:/g, "");
-// const noteName = compose(title, path(["name", 0, "_"]));
-// const noteCopy = compose(join("\n"), path(["text", 0, "p"]));
+// parseList::
+const parseLI = compose((x) => `\n - ${x}`, getText);
 
-// const parseNote = (acc, [, [note]]) => {
-//   return acc.concat([[noteName(note), noteCopy(note)]]);
-// };
-
-// const parseNotes = compose(
-//   reduce(parseNote, []),
-//   toPairs,
-//   path(["root", "notes", 0])
-// );
-
+//
 const parseEntry = (entry) => {
-  const entryTitle = `## ${pathOr("", ["name", "_text"], entry)}`;
-  const { p, linklist } = entry.text;
+  const name = pathOr("", ["name", "text"], entry);
 
-  // console.log("entry", entry);
-  // console.log("entry?title", entryTitle);
-  // console.log("entry?p", p);
-  // console.log("entry?ll", linklist);
+  const ps = compose(parseP, toArray, pathOr([], ["text", "p"]))(entry);
+
+  const hs = compose(parseH, toArray, pathOr([], ["text", "h"]))(entry);
+
+  const lists = compose(
+    join(""),
+    map(parseLI),
+    pathOr([], ["text", "list", "li"])
+  )(entry);
+
+  const x = compose(parseEntry, getParsedEntry);
+
+  const links = compose(
+    joinNewLine,
+    map(x),
+    getLinkIds,
+    pathOr([], ["text", "linklist"])
+  )(entry);
+
+  return [`## ${name}`, ps, hs, lists, links].join("\n\n");
 };
+
+const flattenLinks = (linklist) =>
+  Array.isArray(linklist)
+    ? linklist.flatMap(getLink)
+    : [].concat(getLink(linklist));
+
+const getLinkIds = compose(map(getId), flattenLinks);
 
 // parseLogEntry:: CalendarEntry -> String
 const parseLogEntry = (logentry) => {
@@ -95,28 +103,15 @@ const parseLogEntry = (logentry) => {
   let body = "";
 
   if (!isNil(p)) {
-    body = `${body}${parseP(logentry.p)}`;
+    const ps = [].concat(p);
+    body = `${body}${parseP(ps)}`;
   }
 
   if (!isNil(linklist)) {
-    const links = Array.isArray(linklist)
-      ? linklist.flatMap(getLink)
-      : [].concat(getLink(linklist));
-
-    links.map(getParsedEntry);
-
-    // body = `${body}\n\n${getEntries(links)}`
-
-    // body = `${body}\n\n${entries.join()}`;
-
-    // links.map(compose(joinNewLine, parseEntry, getEntry, getId));
-
-    // joinNewLine(entries);
-
-    // console.log("links", links);
-
-    // console.log("LL", JSON.stringify(logentry.linklist));
-    // body = `${body}${parseLL(logentry.linklist)}`;
+    const links = getLinkIds(linklist);
+    const a = map(parseEntry, map(getParsedEntry, links));
+    console.log("entry:", joinNewLine(a));
+    body = `${body}\n\n${joinNewLine(a)}`;
   }
 
   return body;
@@ -128,18 +123,16 @@ const getCalendar = compose(
     key,
     eleventy(getText(name), parseLogEntry(logentry)),
   ]),
+  // filter needs fixin
   filter(([key, data]) => isLog(key) && hasLogentry(data)),
   toPairs,
   pathOr({}, ["root", "calendar", "log"])
 );
 
 const parseCalendar = (campaignFile) => {
-  getParsedEntry = compose(parseEntry, initFinder(campaignFile), getId);
+  getParsedEntry = initFinder(campaignFile);
 
   return getCalendar(campaignFile);
 };
 
 export default parseCalendar;
-
-// (fn, [a, b]) => return [fn(a), b]
-// merge link lists

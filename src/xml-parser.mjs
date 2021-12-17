@@ -18,7 +18,7 @@ parser.ontext = function (t) {
   if (text !== "") {
     const lens = lensPath([...currentPath, "text"]);
     const oldT = view(lens, result) || "";
-    result = set(lens, `${oldT} ${text}`, result);
+    result = set(lens, `${oldT} ${text}`.trim(), result);
   }
 };
 
